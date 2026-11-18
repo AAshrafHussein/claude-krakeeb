@@ -1,0 +1,16 @@
+{
+  "description": "Start the krakeeb session browser in the background when a Claude Code session starts",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/start.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

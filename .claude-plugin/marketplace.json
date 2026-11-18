@@ -1,0 +1,14 @@
+{
+  "name": "krakeeb",
+  "description": "Krakeeb: a local browser for your Claude Code sessions",
+  "owner": { "name": "AAshrafHussein", "url": "https://github.com/AAshrafHussein" },
+  "plugins": [
+    {
+      "name": "krakeeb",
+      "description": "Browse your Claude Code sessions as a tree of chats, branches and continuations. Read-only, local, no LLM calls.",
+      "source": "./",
+      "category": "productivity",
+      "homepage": "https://github.com/AAshrafHussein/claude-krakeeb"
+    }
+  ]
+}

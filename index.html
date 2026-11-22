@@ -102,6 +102,9 @@ select{font:inherit;border:1px solid var(--line2);background:var(--panel);color:
 .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
 .btn.pri:hover{filter:brightness(1.07);color:#fff}
 .btn.sel{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.resume{display:flex;align-items:center;gap:10px;background:var(--panel2);border:1px solid var(--line2);border-radius:10px;padding:8px 8px 8px 14px}
+.resume code{flex:1;min-width:0;font:12.5px var(--mono);overflow-x:auto;white-space:nowrap}
+.resume .btn{flex:none}
 .sep{width:1px;height:20px;background:var(--line2);margin:0 4px}
 .sec h4{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--faint)}
 .quote{border-left:3px solid var(--violet);background:var(--violet-soft);padding:8px 12px;border-radius:0 8px 8px 0;font-size:13px;white-space:pre-wrap;word-break:break-word;max-height:140px;overflow:auto}
@@ -292,14 +295,15 @@ function detail(s,by){
   const pr=d?d.prompts:null;
   return`<div class="detail">
    <div class="actions">
-     ${DATA.platform==="darwin"&&!DATA.demo?`<button class="btn pri" data-act="term" data-id="${s.id}">Resume in Terminal</button>`:""}
-     <button class="btn" data-copy="${esc(resume)}">Copy resume command</button>
+     ${DATA.platform==="darwin"&&!DATA.demo?`<button class="btn" data-act="term" data-id="${s.id}">Resume in Terminal</button>`:""}
      <button class="btn" data-copy="${s.id}">Copy id</button>
      <span class="sep"></span>
      <button class="btn ${m.status==="hot"?"sel":""}" data-mark="hot" data-id="${s.id}">★ Hot</button>
      <button class="btn ${m.status==="obsolete"?"sel":""}" data-mark="obsolete" data-id="${s.id}">Obsolete</button>
      ${m.status?`<button class="btn" data-mark="" data-id="${s.id}">Clear mark</button>`:""}
    </div>
+   <div class="sec"><h4>Get back to this chat</h4>
+     <div class="resume"><code>${esc(resume)}</code><button class="btn pri" data-copy="${esc(resume)}">Copy resume command</button></div></div>
    ${par?`<div class="sec"><h4>${s.relation==="branch"?"Branched from":"Continued from"}</h4>
       <a href="#" data-jump="${par.id}">${esc(title(par))}</a> <span class="mono" style="color:var(--faint)">${par.id.slice(0,8)}</span>
       ${s.branched_after?`<div class="quote" style="margin-top:8px"><b style="font-size:11px;letter-spacing:.05em;text-transform:uppercase">Last shared prompt</b>\n${esc(clean(s.branched_after))}</div>`:""}</div>`:""}

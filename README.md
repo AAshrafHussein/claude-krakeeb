@@ -2,6 +2,17 @@
 
 **A local page for browsing all your Claude Code sessions as a tree, so you can see what's still running and sort out the clutter.**
 
+## Highlights
+
+- **🔝 What's active is always on top.** Chats are ranked by their most recent activity, including activity in any branch below them. When a branch or sub-session gets busy, it pulls its whole family and its project to the top of the page. A newly started session lands at the top too. The page refreshes every 8 seconds, so the chats that need your attention are always the first thing you see.
+- **↩️ Get back to any chat in one click.** Every chat shows its ready-to-run resume command, already pointing at the right folder. Click **Copy resume command** and paste it into a terminal. No more hunting for session ids. On macOS, **Resume in Terminal** opens it for you.
+
+  ![Resume command for a chat](docs/screenshot-resume.png)
+
+- **🌳 Branches and continuations as a tree.** Every fork sits under the chat it came from, with the last prompt they share, so you can tell branches apart at a glance.
+- **🧹 Sort the clutter.** Mark chats ★ Hot or Obsolete, add your own notes, and filter by them.
+- **🔒 Local and read-only.** No LLM calls, nothing loaded from the internet, and nothing in `~/.claude` is changed.
+
 > *karakeeb* (كراكيب) is Arabic for the clutter that piles up in the corner of the house: old stuff someone will sort out one day. Every Arab parent has said "لمّوا الكراكيب دي" ("gather up this clutter"). After a few weeks of branching, resuming and backgrounding Claude Code chats, your sessions look a lot like that.
 
 ![Krakeeb overview](docs/screenshot.png)
@@ -16,7 +27,7 @@ Claude Code saves every session in `~/.claude/projects`. Krakeeb reads those fil
 - **How each chat started.** For a branch, that's the first prompt after the split, plus the last prompt it shares with its parent.
 - **Everything else already on disk:** every prompt you typed, git branch, models, cost, lines changed, subagents and published artifacts.
 - **Sorting the clutter:** mark chats ★ Hot or Obsolete, add notes, filter and search. Obsolete chats are dimmed.
-- **Resuming:** copy the `claude --resume` command, or on macOS open it straight in Terminal.
+- **Resuming:** every chat shows its `claude --resume` command with a copy button, or on macOS open it straight in Terminal.
 
 ![Expanded branch](docs/screenshot-detail.png)
 

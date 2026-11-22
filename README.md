@@ -13,6 +13,17 @@
 - **🧹 Sort the clutter.** Mark chats ★ Hot or Obsolete, add your own notes, and filter by them.
 - **🔒 Local and read-only.** No LLM calls, nothing loaded from the internet, and nothing in `~/.claude` is changed.
 
+See [ROADMAP.md](ROADMAP.md) for what's planned next.
+
+> [!WARNING]
+> **Claude Code deletes old sessions automatically.** By default, transcripts older than **30 days** are removed from `~/.claude/projects`, and once they're gone, Krakeeb can't show them and `claude --resume` can't reopen them. To keep them longer, set `cleanupPeriodDays` in `~/.claude/settings.json`, for example:
+>
+> ```json
+> { "cleanupPeriodDays": 365 }
+> ```
+>
+> Merge this into your existing settings rather than replacing the file.
+
 > *karakeeb* (كراكيب) is Arabic for the clutter that piles up in the corner of the house: old stuff someone will sort out one day. Every Arab parent has said "لمّوا الكراكيب دي" ("gather up this clutter"). After a few weeks of branching, resuming and backgrounding Claude Code chats, your sessions look a lot like that.
 
 ![Krakeeb overview](docs/screenshot.png)

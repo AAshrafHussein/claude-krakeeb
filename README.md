@@ -1,3 +1,5 @@
+<img src="assets/icon.svg" width="72" alt="Krakeeb icon">
+
 # Krakeeb · كراكيب
 
 **A local page for browsing all your Claude Code sessions as a tree, so you can see what's still running and sort out the clutter.**

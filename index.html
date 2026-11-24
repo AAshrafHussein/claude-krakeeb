@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Krakeeb</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📦</text></svg>">
+<link rel="icon" id="favicon" type="image/svg+xml" href="">
 <style>
 :root{
   --bg:#f6f5f2; --panel:#ffffff; --panel2:#faf9f7; --ink:#1d1c1a; --muted:#6f6b65; --faint:#a19c94;
@@ -32,7 +32,8 @@ a{color:var(--blue);text-decoration:none} a:hover{text-decoration:underline}
 .app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
 aside{border-right:1px solid var(--line);padding:22px 14px;position:sticky;top:0;height:100vh;overflow:auto;background:var(--panel2)}
 .brand{display:flex;align-items:center;gap:10px;padding:0 8px 18px}
-.brand .logo{width:30px;height:30px;border-radius:8px;background:var(--accent-soft);display:grid;place-items:center;font-size:17px}
+.brand .logo{width:32px;height:32px;flex:none}
+.brand .logo svg{width:100%;height:100%;display:block}
 .brand .ar{font-weight:500;color:var(--muted);margin-inline-start:6px}
 .demo{background:var(--busy-soft);color:var(--busy);border-radius:10px;padding:8px 12px;font-size:13px;margin-bottom:14px}
 .brand h1{font-size:15px;margin:0;font-weight:600}
@@ -134,7 +135,7 @@ textarea:focus{border-color:var(--accent)}
 <body>
 <div class="app">
   <aside>
-    <div class="brand"><div class="logo">📦</div><div><h1>Krakeeb<span class="ar" lang="ar">كراكيب</span></h1><small>Your Claude Code sessions, sorted</small></div></div>
+    <div class="brand"><div class="logo" id="logo"></div><div><h1>Krakeeb<span class="ar" lang="ar">كراكيب</span></h1><small>Your Claude Code sessions, sorted</small></div></div>
     <div class="side-h">Projects</div>
     <div id="projects"></div>
     <div class="side-h">Activity</div>
@@ -162,6 +163,16 @@ textarea:focus{border-color:var(--accent)}
 <div class="toast" id="toast"></div>
 <script>
 const $=s=>document.querySelector(s);
+const ICON='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#c96442"/><g stroke="#fbf1ea" stroke-width="3.2" stroke-linecap="round" fill="none"><path d="M32 31V14"/><path d="M32 24l-8-6"/><path d="M32 20l8-5"/></g><g fill="#fbf1ea"><circle cx="32" cy="12" r="3.6"/><circle cx="22.5" cy="17" r="3.6"/><circle cx="41.5" cy="14" r="3.6"/><path d="M10 27l6-3h10l4 5H14z" opacity=".75"/><path d="M54 27l-6-3H38l-4 5h16z" opacity=".75"/><rect x="13" y="30" width="38" height="22" rx="3"/></g><rect x="13" y="30" width="38" height="5" fill="#a94f31" opacity=".35"/></svg>';
+// Tab icon + title: a green dot and "N running" when any session is busy.
+let iconState=null;
+function setTabStatus(running){
+  if(iconState===running)return; iconState=running;
+  const dot=running?'<circle cx="52" cy="12" r="11" fill="#2f9e62" stroke="#fff" stroke-width="4"/>':'';
+  $("#favicon").href="data:image/svg+xml,"+encodeURIComponent(ICON.replace("</svg>",dot+"</svg>"));
+  document.title=running?`Krakeeb · ${running} running`:"Krakeeb";
+}
+$("#logo").innerHTML=ICON; setTabStatus(0);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const LS={get(k,d){try{const v=localStorage.getItem("csb."+k);return v==null?d:JSON.parse(v)}catch{return d}},set(k,v){try{localStorage.setItem("csb."+k,JSON.stringify(v))}catch{}}};
 let DATA=null, lastOk=0, details={}, open=new Set(LS.get("open",[]));
@@ -213,6 +224,7 @@ function sortKey(s){return state.sort==="first"?s.first_ts:state.sort==="size"?s
 function render(){
   if(!DATA)return;
   $("#demo").hidden=!DATA.demo;
+  setTabStatus(DATA.sessions.filter(x=>x.live&&x.live.status==="busy").length);
   const all=DATA.sessions, by=Object.fromEntries(all.map(s=>[s.id,s]));
   const kids={}; all.forEach(s=>{if(s.parent&&by[s.parent])(kids[s.parent]=kids[s.parent]||[]).push(s)});
   // a node is shown if it or any descendant matches; ancestors kept for context

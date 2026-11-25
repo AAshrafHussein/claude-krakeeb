@@ -46,6 +46,7 @@ Size: **S** = an evening, **M** = a weekend, **L** = needs design first.
 | **Subagent drill-down** | Expand a subagent to see its own prompt and outcome. | M |
 | **Status line link** | An optional Claude Code status line showing "3 running · 1 idle for 4d", with the page URL. | S |
 | **More terminals for Resume** | iTerm2, Ghostty and Warp on macOS; GNOME Terminal and Konsole on Linux; a setting to choose. | M |
+| **Sync renames to Claude Code** | Renaming in Krakeeb only changes the name Krakeeb shows. An opt-in setting could also save it the way `/rename` does, so `claude --resume` shows the same name. That means writing to Claude Code's session files, so it must stay off by default, skip running sessions and be clearly labelled. | M |
 | **Windows support** | A safe way to check for live processes on Windows, plus testing there. | M |
 
 ## Not planned

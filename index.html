@@ -82,7 +82,11 @@ select{font:inherit;border:1px solid var(--line2);background:var(--panel);color:
 .h-live{background:var(--live);box-shadow:0 0 0 3px var(--live-soft)}
 .h-day{background:var(--hot)} .h-week{background:var(--busy)} .h-old{background:var(--cold);opacity:.6}
 .title{font-weight:600;display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-width:0}
-.title .t{overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.title .t{overflow:hidden;text-overflow:ellipsis;max-width:100%;cursor:text;border-radius:4px;padding:0 3px;margin:0 -3px}
+.title .t:hover{background:var(--line)}
+.title .pen{opacity:0;color:var(--faint);font-weight:400;font-size:12px;cursor:pointer;transition:opacity .15s}
+.row:hover .pen,.title .t:hover+.pen{opacity:1}
+.title input.rn{font:inherit;font-weight:600;color:inherit;background:var(--bg);border:1px solid var(--accent);border-radius:6px;padding:2px 6px;min-width:min(420px,100%);outline:none}
 .sub{color:var(--muted);font-size:13px;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
 .sub em{font-style:normal;color:var(--faint)}
 .badge{font-size:11px;font-weight:500;padding:2px 7px;border-radius:999px;background:var(--line);color:var(--muted);white-space:nowrap}
@@ -187,18 +191,19 @@ function size(b){return b>1048576?(b/1048576).toFixed(1)+" MB":Math.max(1,Math.r
 function tilde(p){return p&&DATA?p.replace(DATA.home,"~"):p}
 function heat(s){if(s.live)return s.live.status==="busy"?"busy":"live";const a=Date.now()-s.last_ts;return a<864e5?"day":a<6048e5?"week":"old"}
 function clean(t){return String(t||"").replace(/<\/?pasted_content[^>]*>/g,"").replace(/\s+/g," ").trim()}
-function title(s){
+function baseTitle(s){
   const autoName=s.live&&s.live.name&&!/^[\w.-]+-[a-z0-9]{1,3}$/i.test(s.live.name)?s.live.name:null;
   return s.custom_title||s.ai_title||autoName||s.agent_name||clean(s.first_prompt).slice(0,90)||"(untitled) "+s.id.slice(0,8)}
 function projKey(s){return s.project_dir}
 function projLabel(dir){const ss=DATA.sessions.filter(s=>s.project_dir===dir&&s.cwd).sort((a,b)=>b.last_ts-a.last_ts);
   const exact=ss.find(s=>s.cwd.replace(/[^A-Za-z0-9]/g,"-")===dir);
   return exact?tilde(exact.cwd):ss.length?tilde(ss[0].cwd):dir.replace(/^-/,"/").replace(/-/g,"/")}
+function title(s){return (s.mark||{}).title||baseTitle(s)}
 function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("on"),1600)}
 
 async function load(){
   try{const r=await fetch("/api/sessions",{cache:"no-store"});DATA=await r.json();lastOk=Date.now();$("#pulse").classList.remove("err");
-    const a=document.activeElement; if(a&&a.tagName==="TEXTAREA")return; render()}
+    const a=document.activeElement; if(a&&(a.tagName==="TEXTAREA"||a.classList.contains("rn")))return; render()}
   catch(e){$("#pulse").classList.add("err");$("#synced").textContent="server unreachable"}
 }
 setInterval(load,8000);
@@ -215,7 +220,7 @@ function matches(s){
   if(f==="nobs"&&m.status==="obsolete")return false;
   if(f==="obs"&&m.status!=="obsolete")return false;
   if(state.q){const q=state.q.toLowerCase();
-    const hay=[s.id,title(s),s.custom_title,s.ai_title,s.agent_name,s.first_prompt,s.latest_prompt,s.cwd,s.git_branch,m.note,s.live&&s.live.name,s.branched_after].join(" ").toLowerCase();
+    const hay=[s.id,title(s),baseTitle(s),s.custom_title,s.ai_title,s.agent_name,s.first_prompt,s.latest_prompt,s.cwd,s.git_branch,m.note,s.live&&s.live.name,s.branched_after].join(" ").toLowerCase();
     if(!hay.includes(q))return false}
   return true
 }
@@ -278,7 +283,7 @@ function card(s,by,kids){
   return`<div class="card ${isOpen?"open":""} ${st==="obsolete"?"obsolete":""}" data-id="${s.id}">
    <div class="row" data-toggle="${s.id}">
      <span class="heat h-${h}" title="${{busy:"Running now",live:"Process open",day:"Active in last 24h",week:"Active this week",old:"Older"}[h]}"></span>
-     <div style="min-width:0"><div class="title"><span class="t">${esc(title(s))}</span>${b.join("")}</div>
+     <div style="min-width:0"><div class="title"><span class="t" data-rename="${s.id}" title="Click to rename">${esc(title(s))}</span><span class="pen" data-rename="${s.id}" title="Rename">✎</span>${b.join("")}</div>
        ${sub?`<div class="sub">${sub}</div>`:""}
        ${m.note?`<div class="note">✎ ${esc(m.note)}</div>`:""}</div>
      <div class="meta"><div class="when" title="${esc(abs(s.last_ts))}">${rel(s.last_ts)}</div>
@@ -302,6 +307,7 @@ function detail(s,by){
     s.compactions?["Compactions",s.compactions]:null,
     s.live?["Process",`pid ${s.live.pid} · ${esc(s.live.status)} · ${esc(s.live.kind||"")}${s.live.name?` · “${esc(s.live.name)}”`:""}`]:null,
     ["Version",esc(s.version||"—")],["File",`<span class="mono">${size(s.size)}</span>`],
+    m.title?["Original title",esc(baseTitle(s))]:null,
     s.ai_title&&s.custom_title&&s.ai_title!==s.custom_title?["Auto title",esc(s.ai_title)]:null,
   ].filter(Boolean);
   const pr=d?d.prompts:null;
@@ -336,8 +342,10 @@ async function loadDetail(id){
 async function post(path,body){const r=await fetch(path,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});return r.ok}
 
 document.addEventListener("click",async e=>{
-  const t=e.target.closest("[data-toggle],[data-filter],[data-proj],[data-copy],[data-mark],[data-act],[data-jump],.tl p");
+  if(e.target.closest("input.rn"))return;
+  const t=e.target.closest("[data-rename],[data-toggle],[data-filter],[data-proj],[data-copy],[data-mark],[data-act],[data-jump],.tl p");
   if(!t)return;
+  if(t.dataset.rename){startRename(t.dataset.rename);return}
   if(t.matches(".tl p")){t.classList.toggle("full");return}
   if(t.dataset.toggle){const id=t.dataset.toggle;if(open.has(id))open.delete(id);else{open.add(id);loadDetail(id)}LS.set("open",[...open]);render();return}
   if(t.dataset.filter){state.filter=t.dataset.filter;LS.set("filter",state.filter);render();return}
@@ -355,6 +363,23 @@ document.addEventListener("focusout",async e=>{
   if((s.mark||{}).note===v||(!v&&!(s.mark||{}).note))return;
   if(await post("/api/mark",{id,note:v||null})){s.mark=Object.assign({},s.mark);if(v)s.mark.note=v;else delete s.mark.note;toast("Note saved");setTimeout(render,0)}
 });
+function startRename(id){
+  const s=DATA.sessions.find(x=>x.id===id), span=document.querySelector(`.card[data-id="${id}"] .t`); if(!s||!span)return;
+  const inp=document.createElement("input"); inp.className="rn"; inp.dataset.rn=id; inp.value=title(s);
+  inp.placeholder=baseTitle(s)+"  (empty = original)"; inp.maxLength=200;
+  span.nextElementSibling&&span.nextElementSibling.classList.contains("pen")&&span.nextElementSibling.remove();
+  span.replaceWith(inp); inp.focus(); inp.select();
+}
+async function finishRename(inp,save){
+  if(inp.dataset.done)return; inp.dataset.done=1;
+  const id=inp.dataset.rn,s=DATA.sessions.find(x=>x.id===id); const v=inp.value.replace(/\s+/g," ").trim();
+  const nv=v&&v!==baseTitle(s)?v:null, cur=(s.mark||{}).title||null;
+  if(save&&nv!==cur&&await post("/api/mark",{id,title:nv})){s.mark=Object.assign({},s.mark);if(nv)s.mark.title=nv;else delete s.mark.title;toast(nv?"Renamed":"Back to original title")}
+  render();
+}
+document.addEventListener("keydown",e=>{const t=e.target;if(!t.classList||!t.classList.contains("rn"))return;
+  if(e.key==="Enter"){e.preventDefault();finishRename(t,true)}else if(e.key==="Escape"){e.preventDefault();finishRename(t,false)}});
+document.addEventListener("focusout",e=>{if(e.target.classList&&e.target.classList.contains("rn"))finishRename(e.target,true)});
 $("#q").addEventListener("input",e=>{state.q=e.target.value.trim();render()});
 $("#sort").addEventListener("change",e=>{state.sort=e.target.value;LS.set("sort",state.sort);render()});
 document.addEventListener("keydown",e=>{if(e.key==="/"&&document.activeElement.tagName!=="INPUT"&&document.activeElement.tagName!=="TEXTAREA"){e.preventDefault();$("#q").focus()}});

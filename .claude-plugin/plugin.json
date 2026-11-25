@@ -1,6 +1,6 @@
 {
   "name": "krakeeb",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A local page that shows all your Claude Code sessions as a tree of chats, branches and continuations, so you can see what's still running and sort out the clutter. Read-only, no LLM calls.",
   "author": { "name": "AAshrafHussein", "url": "https://github.com/AAshrafHussein" },
   "homepage": "https://github.com/AAshrafHussein/claude-krakeeb",

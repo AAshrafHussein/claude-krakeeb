@@ -343,13 +343,14 @@ class H(BaseHTTPRequestHandler):
             with _marks_lock:
                 m = load_marks()
                 cur = m.get(sid, {})
-                for k in ("status", "note"):
+                for k in ("status", "note", "title"):
                     if k in body:
                         v = body[k]
                         if v in (None, ""):
                             cur.pop(k, None)
                         else:
-                            cur[k] = str(v)[:2000]
+                            v = str(v)
+                            cur[k] = " ".join(v.split())[:200] if k == "title" else v[:2000]
                 if cur:
                     m[sid] = cur
                 else:

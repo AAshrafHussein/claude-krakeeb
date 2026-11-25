@@ -13,6 +13,7 @@
 
 - **🌳 Branches and continuations as a tree.** Every fork sits under the chat it came from, with the last prompt they share, so you can tell branches apart at a glance.
 - **🧹 Sort the clutter.** Mark chats ★ Hot or Obsolete, add your own notes, and filter by them.
+- **✏️ Rename any chat in place.** Hover a title and click it to give the chat your own name. Enter saves, Esc cancels, and clearing it brings back the original. Names are kept in Krakeeb's own file, so Claude Code's sessions are never touched.
 - **🔒 Local and read-only.** No LLM calls, nothing loaded from the internet, and nothing in `~/.claude` is changed.
 
 See [ROADMAP.md](ROADMAP.md) for what's planned next.
@@ -39,12 +40,12 @@ Claude Code saves every session in `~/.claude/projects`. Krakeeb reads those fil
 - **When each chat was last active**, plus its title (your `/rename`, else Claude Code's own auto title, else the first prompt).
 - **How each chat started.** For a branch, that's the first prompt after the split, plus the last prompt it shares with its parent.
 - **Everything else already on disk:** every prompt you typed, git branch, models, cost, lines changed, subagents and published artifacts.
-- **Sorting the clutter:** mark chats ★ Hot or Obsolete, add notes, filter and search. Obsolete chats are dimmed.
+- **Sorting the clutter:** rename chats, mark them ★ Hot or Obsolete, add notes, filter and search. Obsolete chats are dimmed.
 - **Resuming:** every chat shows its `claude --resume` command with a copy button, or on macOS open it straight in Terminal.
 
 ![Expanded branch](docs/screenshot-detail.png)
 
-**It's read-only and local.** It never changes anything in `~/.claude`. Your marks and notes go to their own file (`~/.claude/krakeeb/marks.json`). The server listens on `127.0.0.1` only, loads nothing from the internet, and makes **no LLM calls**: everything shown is already on disk.
+**It's read-only and local.** It never changes anything in `~/.claude`. Your names, marks and notes go to their own file (`~/.claude/krakeeb/marks.json`). The server listens on `127.0.0.1` only, loads nothing from the internet, and makes **no LLM calls**: everything shown is already on disk.
 
 ## Install
 
